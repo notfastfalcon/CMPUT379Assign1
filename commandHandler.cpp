@@ -1,11 +1,12 @@
 #include "stdlib.h"
 #include "string.h"
 #include "iostream"
-#include "commandHandler"
+#include "commandHandler.h"
+#include "utility.h"
 using namespace std;
 
 bool shellExit() {
-	exit(0);
+	//exit here
 	return false;
 }
 
@@ -13,11 +14,11 @@ void shellJobs() {
 	//print all jobs here
 }
 
-void killProcess(string processPid) {
+void killProcess(int processPid) {
 	// kill process with given pid
 }
 
-void resumeProcess(string processPid) {
+void resumeProcess(int processPid) {
 	//resume the process with given pid
 }
 
@@ -25,15 +26,15 @@ void shellSleep(int time) {
 	//sleep for time
 }
 
-void suspendProcess(string processPid) {
+void suspendProcess(int processPid) {
 	//suspend process with given pid
 }
 
-void waitForProcess(string processPid) {
+void waitForProcess(int processPid) {
 	//wait for process with given pid to complete
 }
 
-void specialCommand(string raw_input) {
+void executeCommand(string raw_input) {
 	//process these special commands
 }
 
@@ -41,7 +42,7 @@ bool shellProcess(string raw_input, int commandType) {
 	bool runShell = true;
 	switch (commandType) {
 		case 0:
-			specialCommand(raw_input);
+			executeCommand(raw_input);
 			break;
 		case 1:
 			runShell = shellExit();
@@ -50,19 +51,19 @@ bool shellProcess(string raw_input, int commandType) {
 			shellJobs();
 			break;
 		case 3:
-			killProcess(raw_input.substr(5));
+			killProcess(stoi(raw_input.substr(5)));
 			break;
 		case 4:
-			resumeProcess(raw_input.substr(7));
+			resumeProcess(stoi(raw_input.substr(7)));
 			break;
 		case 5:
 			shellSleep(stoi(raw_input.substr(6)));
 			break;
 		case 6:
-			suspendProcess(raw_input.substr(8));
+			suspendProcess(stoi(raw_input.substr(8)));
 			break;
 		case 7:
-			waitForProcess(raw_input.substr(5));
+			waitForProcess(stoi(raw_input.substr(5)));
 		case -1:
 			break;
 	}

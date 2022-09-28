@@ -23,6 +23,14 @@ int removeCommand(int pidToRemove) {
 	}
 }
 
+bool getExistence(int pidToCheck) {
+	return find(commandPid.begin(), commandPid.end(), pidToCheck) != commandPid.end();
+}
+
+string getError() {
+	return "Please check the input!\n";
+}
+
 clock_t startTimer() {
 	clock_t startTime = clock();
 	return startTime;

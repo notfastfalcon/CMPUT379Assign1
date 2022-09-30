@@ -8,11 +8,6 @@
 #include "commandHandler.h"
 using namespace std;
 
-#define LINE_LENGTH 100 //Max # of characters in an input line
-#define MAX_ARGS 7 // Max number of arguments to a command
-#define MAX_LENGTH 20 //Max # of characters in an argument
-#define MAX_PT_ENTRIES 32 //Max entries in the Process Table
-
 int getCommandType(string raw_input) {
 	map<string, int> commands = {
 	{"exit", 1},
@@ -39,15 +34,25 @@ string getInput() {
 	return cmdArgument;
 }
 
-void bootUpShell() {
+void shell() {
 	bool runShell = true;
+	//TODO: If required implement this init
+	//shellInit();
 	while (runShell) {
+		cout << "SHELL379: ";
 		string raw_input = getInput();
 		int commandType = getCommandType(raw_input);
 		runShell = shellProcess(raw_input, commandType);
 	}
+	//just to tell OS successful Completion
+	shellQuit();
+}
+
+void shellQuit(){
+	cout<<"Goodbye!\n";
+	exit(0);
 }
 
 int main (int argc, char *argv[]) {
-	bootUpShell();
+	shell();
 }

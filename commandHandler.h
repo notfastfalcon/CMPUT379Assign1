@@ -13,6 +13,7 @@ void shellSleep(int);
 void suspendProcess(int);
 void waitForProcess(int);
 void executeCommand(string);
+pid_t newProcess(string);
 bool shellProcess(string, int);
 
 #endif

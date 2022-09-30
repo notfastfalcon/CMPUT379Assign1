@@ -10,6 +10,10 @@ using namespace std;
 
 bool shellExit() {
 	//exit here
+	for (auto activePID: getActiveProcesses()) {
+		waitForProcess(activePID);
+	}
+	shellJobs();
 	return false;
 }
 
@@ -62,7 +66,28 @@ void waitForProcess(int processPid) {
 
 void executeCommand(string raw_input) {
 	//process these special commands
+	pid_t childPid = newProcess(raw_input);
 }
+
+pid_t newProcess(string raw_input) {
+	//convert string to character array
+	int size = getNumberOfParams(raw_input);
+	char *args[size+1] = getCharEquivalent(raw_input);
+	char *env[] = {NULL};
+
+	//create new process using fork
+	pid_t childPid = fork();
+	if(childPid == 0) {
+		if(execve(args[0], args, env) < 0)
+			perror("Exceve Error!");
+	}
+	else if(childPid == -1)
+		perror("Fork Error!");
+	
+	else
+		return childPid;
+}
+
 
 bool shellProcess(string raw_input, int commandType) {
 	bool runShell = true;

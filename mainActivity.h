@@ -7,6 +7,7 @@ using namespace std;
 
 int getCommandType(string);
 string getInput(void);
-void bootUpShell(void);
+void shell(void);
+void shellQuit(void);
 
 #endif

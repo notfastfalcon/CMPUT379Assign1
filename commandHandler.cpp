@@ -80,6 +80,7 @@ void waitForProcess(int processPid) {
 void executeCommand(string raw_input) {
 	//process these special commands
 	pid_t childPid = newProcess(raw_input);
+	addToActiveCommand((int)childPid, raw_input);
 }
 
 pid_t newProcess(string raw_input) {
@@ -136,8 +137,7 @@ bool shellProcess(string raw_input, int commandType) {
 				runShell = shellExit();
 				break;
 			case 2:
-				executeCommand(raw_input);
-				//shellJobs();
+				shellJobs();
 				break;
 			case 3:
 				killProcess(stoi(raw_input.substr(5)));

@@ -32,7 +32,7 @@ int getCommandType(string raw_input) {
 
 string getInput() {
 	string cmdArgument;
-	cout << "SHELL379:";
+	cout << "SHELL379: ";
 	getline(cin, cmdArgument);
 	return cmdArgument;
 }

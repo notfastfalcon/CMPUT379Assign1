@@ -9,28 +9,38 @@
 #include "utility.h"
 using namespace std;
 
+//exit here
 bool shellExit() {
-	//exit here
 	for (auto activePID: getActiveProcesses()) {
-		waitForProcess(activePID);
+		killProcess(activePID);
 	}
 	shellJobs();
 	return false;
 }
 
+//print all jobs here
 void shellJobs() {
-	//print all jobs here
+	for (auto pid: getActiveProcesses()) {
+		if(commands[pid][1]) {
+			cout << duration(commands[pid][0], commands[pid][1]);
+		}
+	}
 }
 
+//kill specified process
 void killProcess(int processPid) {
 	//Check if Pid is active
-	if(getExistence(processPid))
+	if(getExistence(processPid)) {
 		// kill process with given pid
 		kill((pid_t)processPid, SIGKILL);
+		clock_t endTime = startTimer();
+		addToActiveCommand(processPid, endTime);
+	}
 	else
 		perror("No PID Found");
 }
 
+//resume specified process
 void resumeProcess(int processPid) {
 	//Check if Pid is active
 	if(getExistence(processPid))	
@@ -40,11 +50,13 @@ void resumeProcess(int processPid) {
 		perror("No PID Found");
 }
 
+//shell sleeps for specified seconds
 void shellSleep(int time) {
 	//sleep for time
 	sleep(time);
 }
 
+//suspend specified process
 void suspendProcess(int processPid) {
 	//Check if Pid is active
 	if(getExistence(processPid))
@@ -55,6 +67,7 @@ void suspendProcess(int processPid) {
 
 }
 
+//wait for specified process to complete
 void waitForProcess(int processPid) {
 	//Check if Pid is active
 	if(getExistence(processPid)) {
@@ -87,6 +100,9 @@ pid_t newProcess(string raw_input) {
 
 	//create new process using fork
 	pid_t childPid = fork();
+
+	clock_t startTime = startTimer();
+	addToActiveCommand(childPid, startTime);
 	if(childPid == 0) {
 		if(execvp(args[0], args) < 0) {
 			perror("Execve Error");
@@ -123,7 +139,8 @@ bool shellProcess(string raw_input, int commandType) {
 				runShell = shellExit();
 				break;
 			case 2:
-				shellJobs();
+				executeCommand(raw_input);
+				//shellJobs();
 				break;
 			case 3:
 				killProcess(stoi(raw_input.substr(5)));

@@ -73,28 +73,22 @@ void executeCommand(string raw_input) {
 pid_t newProcess(string raw_input) {
 	//convert string to character array
 	int size = getNumberOfParams(raw_input);
-	char *args[size+1]; // size+1 to get NULL in the end
-	args[-1] = NULL;
-	char *env[] = {NULL};
-
+	char *args[size+1];
+	args[size] = NULL; // should always be NULL terminated
 	//convert string to char*[]
 	size_t position = 0;
     int startSubString = 0;
     for (int i = 0; i < size; i++) {
     	position = raw_input.find(" ", startSubString);
     	string interimString = raw_input.substr(startSubString, position-startSubString);
-    	//add path to first command argument
-    	if (i == 0) 
-    		interimString = "/usr/bin/" + interimString;
-    	args[i] = strdup(interimString.c_str());
-    	cout << args[i] << "\n";
     	startSubString = position + 1;
+    	args[i] = strdup(interimString.c_str());
     }
 
 	//create new process using fork
 	pid_t childPid = fork();
 	if(childPid == 0) {
-		if(execve(args[0], args, env) < 0) {
+		if(execvp(args[0], args) < 0) {
 			perror("Execve Error");
 			_exit(1);
 		}
@@ -105,6 +99,8 @@ pid_t newProcess(string raw_input) {
 	}
 	
 	else
+		//wait for execvp to terminate
+		wait(NULL);
 		return childPid;
 }
 

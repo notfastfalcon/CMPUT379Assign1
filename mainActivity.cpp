@@ -32,16 +32,20 @@ int getCommandType(string raw_input) {
 
 string getInput() {
 	string cmdArgument;
+	cout << "SHELL379:";
 	getline(cin, cmdArgument);
 	return cmdArgument;
 }
 
+void shellInit() {
+	system("clear");
+	cout << "Welcome to CMPUT 379 Shell!\n";
+}
+
 void shell() {
 	bool runShell = true;
-	//TODO: If required implement this init
-	//shellInit();
+	shellInit();
 	while (runShell) {
-		cout << "SHELL379: ";
 		string raw_input = getInput();
 		int commandType = getCommandType(raw_input);
 		runShell = shellProcess(raw_input, commandType);
@@ -52,7 +56,6 @@ void shell() {
 
 void shellQuit(){
 	cout<<"Goodbye!\n";
-	fflush(stdout);
 	_exit(0);
 }
 

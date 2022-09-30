@@ -38,7 +38,6 @@ string getInput() {
 }
 
 void shellInit() {
-	system("clear");
 	cout << "Welcome to CMPUT 379 Shell!\n";
 }
 

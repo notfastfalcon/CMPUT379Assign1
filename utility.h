@@ -6,13 +6,12 @@
 #include "vector"
 using namespace std;
 
-void addToActiveCommand(pid_t, clock_t);
+void addToActiveCommand(int, string);
 int removeCommand(int);
 vector<int> getActiveProcesses(void);
 bool getExistence (int);
-clock_t startTimer(void);
-clock_t endTimer(void);
-clock_t duration(clock_t, clock_t);
+float sysDuration(struct, struct);
+float userDuration(struct, struct);
 int getNumberOfParams(string);
 int checkSpecialCmd(string);
 

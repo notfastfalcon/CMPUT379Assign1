@@ -9,21 +9,21 @@
 #include "utility.h"
 using namespace std;
 
+struct rusage start, end;
+
 //exit here
 bool shellExit() {
 	for (auto activePID: getActiveProcesses()) {
 		killProcess(activePID);
 	}
-	shellJobs();
 	return false;
 }
 
 //print all jobs here
 void shellJobs() {
-	for (auto pid: getActiveProcesses()) {
-		if(commands[pid][1]) {
-			cout << duration(commands[pid][0], commands[pid][1]);
-		}
+	for (auto activePID: getActiveProcesses()) {
+		cout << activePID <<"\t"<< sysDuration(&start, &end) <<"\t"<< userDuration(&start, &end);
+		cout <<"\n";
 	}
 }
 
@@ -33,8 +33,7 @@ void killProcess(int processPid) {
 	if(getExistence(processPid)) {
 		// kill process with given pid
 		kill((pid_t)processPid, SIGKILL);
-		clock_t endTime = startTimer();
-		addToActiveCommand(processPid, endTime);
+		getrusage(RUSAGE_CHILDREN, &end);
 	}
 	else
 		perror("No PID Found");
@@ -99,10 +98,8 @@ pid_t newProcess(string raw_input) {
     }
 
 	//create new process using fork
+	getrusage(RUSAGE_CHILDREN, &start);
 	pid_t childPid = fork();
-
-	clock_t startTime = startTimer();
-	addToActiveCommand(childPid, startTime);
 	if(childPid == 0) {
 		if(execvp(args[0], args) < 0) {
 			perror("Execve Error");

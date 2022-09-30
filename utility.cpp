@@ -8,48 +8,44 @@
 #include "utility.h"
 using namespace std;
 
-//TODO: edit the two lines below after functionality implemented
-map <pid_t, vector<clock_t>> commands;
+map <int, vector<string>> processTable;
 
 //add to tracked pids
-void addToActiveCommand(pid_t pidToAdd, clock_t time) {
-	commands[pidToAdd].push_back(time);
+void addToActiveCommand(int pidToAdd, string args) {
+	processTable[pidToAdd].push_back(args);
+	//process is running
+	processTable[pidToAdd].push_back("R");
 }
 
 //remove from tracked pids
 int removeCommand(int pidToRemove) {
-	commands.erase((pid_t) pidToRemove);	
+	processTable.erase(pidToRemove);	
 }
 
 //return all the active pids
 vector<int> getActiveProcesses() {
 	vector<int> commandPid;
-	for (auto iterator: commands) {
-		commandPid.push_back((int)iterator.first);
+	for (auto iterator: processTable) {
+		commandPid.push_back(iterator.first);
 	}
 	return commandPid;
 }
 
 //check if given pid exists
 bool getExistence(int pidToCheck) {
-	return commands.find((pid_t)pidToCheck) != commands.end();
+	return processTable.find(pidToCheck) != processTable.end();
 }
 
-clock_t startTimer() {
-	clock_t startTime = clock();
-	return startTime;
+//get the system time used by the process
+//this code is highly inspired from a DelftStack post. Link in README
+float sysDuration(struct rusage *start, struct rusage *end) {
+	return(end.ru_stime.tv_sec - start.ru_stime.tv_sec);
 }
 
-clock_t endTimer() {
-	clock_t endTime = clock();
-	return endTime;
-}
-
-//get the duration of time between startTime and endTime
-clock_t duration(clock_t startTime, clock_t endTime) {
-	clock_t duration = endTime - startTime;
-	duration = duration/CLOCKS_PER_SEC; //to get time in s instead of ms
-	return duration;
+//get the user time used by the process
+//this code is highly inspired from a DelftStack post. Link in README
+float userDuration(struct rusage *start, struct rusage *end) {
+	return(end.ru_utime.tv_sec - start.ru_utime.tv_sec);
 }
 
 // get number of input parameters from command line

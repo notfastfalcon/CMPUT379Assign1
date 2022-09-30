@@ -5,6 +5,7 @@
 #include "vector"
 #include "map"
 #include "algorithm"
+#include "sys/resource.h"
 #include "utility.h"
 using namespace std;
 
@@ -39,13 +40,13 @@ bool getExistence(int pidToCheck) {
 //get the system time used by the process
 //this code is highly inspired from a DelftStack post. Link in README
 float sysDuration(struct rusage *start, struct rusage *end) {
-	return(end.ru_stime.tv_sec - start.ru_stime.tv_sec);
+	return(end->ru_stime.tv_sec - start->ru_stime.tv_sec);
 }
 
 //get the user time used by the process
 //this code is highly inspired from a DelftStack post. Link in README
 float userDuration(struct rusage *start, struct rusage *end) {
-	return(end.ru_utime.tv_sec - start.ru_utime.tv_sec);
+	return(end->ru_utime.tv_sec - start->ru_utime.tv_sec);
 }
 
 // get number of input parameters from command line

@@ -9,7 +9,7 @@
 #include "utility.h"
 using namespace std;
 
-struct rusage start, end;
+struct rusage startTime, endTime;
 
 //exit here
 bool shellExit() {
@@ -22,7 +22,7 @@ bool shellExit() {
 //print all jobs here
 void shellJobs() {
 	for (auto activePID: getActiveProcesses()) {
-		cout << activePID <<"\t"<< sysDuration(&start, &end) <<"\t"<< userDuration(&start, &end);
+		cout << activePID <<"\t"<< sysDuration(&startTime, &endTime) <<"\t"<< userDuration(&startTime, &endTime);
 		cout <<"\n";
 	}
 }
@@ -33,7 +33,7 @@ void killProcess(int processPid) {
 	if(getExistence(processPid)) {
 		// kill process with given pid
 		kill((pid_t)processPid, SIGKILL);
-		getrusage(RUSAGE_CHILDREN, &end);
+		getrusage(RUSAGE_CHILDREN, &endTime);
 	}
 	else
 		perror("No PID Found");
@@ -98,7 +98,7 @@ pid_t newProcess(string raw_input) {
     }
 
 	//create new process using fork
-	getrusage(RUSAGE_CHILDREN, &start);
+	getrusage(RUSAGE_CHILDREN, &startTime);
 	pid_t childPid = fork();
 	if(childPid == 0) {
 		if(execvp(args[0], args) < 0) {

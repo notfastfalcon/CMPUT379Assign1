@@ -28,7 +28,7 @@ void killProcess(int processPid) {
 		// kill process with given pid
 		kill((pid_t)processPid, SIGKILL);
 	else
-		perror("No PID Found!");
+		perror("No PID Found");
 }
 
 void resumeProcess(int processPid) {
@@ -37,7 +37,7 @@ void resumeProcess(int processPid) {
 		//resume the process with given pid
 		kill((pid_t)processPid, SIGCONT);
 	else
-		perror("No PID Found!");
+		perror("No PID Found");
 }
 
 void shellSleep(int time) {
@@ -51,7 +51,7 @@ void suspendProcess(int processPid) {
 		//suspend process with given pid
 		kill((pid_t)processPid, SIGSTOP);
 	else
-		perror("No PID Found!");
+		perror("No PID Found");
 
 }
 
@@ -62,7 +62,7 @@ void waitForProcess(int processPid) {
 
 	}
 	else
-		perror("No PID Found!");
+		perror("No PID Found");
 }
 
 void executeCommand(string raw_input) {
@@ -82,24 +82,39 @@ pid_t newProcess(string raw_input) {
     int startSubString = 0;
     for (int i = 0; i < size; i++) {
     	position = raw_input.find(" ", startSubString);
-    	string interimString = raw_input.substr(startSubString, position);
+    	string interimString = raw_input.substr(startSubString, position-startSubString);
+    	//add path to first command argument
+    	if (i == 0) 
+    		interimString = "/usr/bin/" + interimString;
     	args[i] = strdup(interimString.c_str());
+    	cout << args[i] << "\n";
     	startSubString = position + 1;
     }
 
 	//create new process using fork
 	pid_t childPid = fork();
 	if(childPid == 0) {
-		if(execve(args[0], args, env) < 0)
-			perror("Exceve Error!");
+		if(execve(args[0], args, env) < 0) {
+			perror("Execve Error");
+			_exit(1);
+		}
 	}
-	else if(childPid == -1)
-		perror("Fork Error!");
+	else if(childPid == -1) {
+		perror("Fork Error");
+		_exit(1);
+	}
 	
 	else
 		return childPid;
 }
 
+void changeDirectory(string path) {
+	char pathDir [path.length() + 1] = {};
+	strcpy(pathDir, path.c_str());
+	if(chdir(pathDir) < 0) {
+		perror("Check directory");
+	}
+}
 
 bool shellProcess(string raw_input, int commandType) {
 	bool runShell = true;
@@ -128,6 +143,9 @@ bool shellProcess(string raw_input, int commandType) {
 				break;
 			case 7:
 				waitForProcess(stoi(raw_input.substr(5)));
+				break;
+			case 8:
+				changeDirectory(raw_input.substr(3));
 			case -1:
 				//do nothing and ask for output again if someone hits enter
 				break;
@@ -135,7 +153,7 @@ bool shellProcess(string raw_input, int commandType) {
 	}
 	// catch all kinds of exceptions
 	catch(...) {
-		perror("Invalid arguments!");
+		perror("Invalid arguments");
 		runShell = true;
 	}
 	return runShell;

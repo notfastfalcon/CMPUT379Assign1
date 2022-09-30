@@ -1,6 +1,7 @@
 #include "stdlib.h"
 #include "errno.h"
 #include "stdio.h"
+#include "unistd.h"
 #include "iostream"
 #include "string.h"
 #include "map"
@@ -17,6 +18,7 @@ int getCommandType(string raw_input) {
 	{"sleep", 5},
 	{"suspend", 6},
 	{"wait", 7},
+	{"cd", 8},
 	{"\n", -1}
 	};
 	for(auto cmd: commands) {
@@ -50,7 +52,8 @@ void shell() {
 
 void shellQuit(){
 	cout<<"Goodbye!\n";
-	exit(0);
+	fflush(stdout);
+	_exit(0);
 }
 
 int main (int argc, char *argv[]) {

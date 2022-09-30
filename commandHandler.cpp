@@ -1,5 +1,6 @@
 #include "stdlib.h"
 #include "string.h"
+#include "bits/stdc++.h"
 #include "signal.h"
 #include "iostream"
 #include "unistd.h"
@@ -27,7 +28,7 @@ void killProcess(int processPid) {
 		// kill process with given pid
 		kill((pid_t)processPid, SIGKILL);
 	else
-		cout<<getError();
+		perror("No PID Found!");
 }
 
 void resumeProcess(int processPid) {
@@ -36,7 +37,7 @@ void resumeProcess(int processPid) {
 		//resume the process with given pid
 		kill((pid_t)processPid, SIGCONT);
 	else
-		cout<<getError();
+		perror("No PID Found!");
 }
 
 void shellSleep(int time) {
@@ -50,7 +51,7 @@ void suspendProcess(int processPid) {
 		//suspend process with given pid
 		kill((pid_t)processPid, SIGSTOP);
 	else
-		cout<<getError();
+		perror("No PID Found!");
 
 }
 
@@ -61,7 +62,7 @@ void waitForProcess(int processPid) {
 
 	}
 	else
-		cout<<getError();
+		perror("No PID Found!");
 }
 
 void executeCommand(string raw_input) {
@@ -72,8 +73,19 @@ void executeCommand(string raw_input) {
 pid_t newProcess(string raw_input) {
 	//convert string to character array
 	int size = getNumberOfParams(raw_input);
-	char *args[size+1] = getCharEquivalent(raw_input);
+	char *args[size+1]; // size+1 to get NULL in the end
+	args[-1] = NULL;
 	char *env[] = {NULL};
+
+	//convert string to char*[]
+	size_t position = 0;
+    int startSubString = 0;
+    for (int i = 0; i < size; i++) {
+    	position = raw_input.find(" ", startSubString);
+    	string interimString = raw_input.substr(startSubString, position);
+    	args[i] = strdup(interimString.c_str());
+    	startSubString = position + 1;
+    }
 
 	//create new process using fork
 	pid_t childPid = fork();
@@ -123,7 +135,7 @@ bool shellProcess(string raw_input, int commandType) {
 	}
 	// catch all kinds of exceptions
 	catch(...) {
-		cout << getError();
+		perror("Invalid arguments!");
 		runShell = true;
 	}
 	return runShell;

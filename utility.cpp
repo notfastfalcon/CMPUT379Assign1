@@ -1,5 +1,6 @@
 #include "stdlib.h"
 #include "string.h"
+#include "bits/stdc++.h"
 #include "iostream"
 #include "vector"
 #include "map"
@@ -34,10 +35,6 @@ bool getExistence(int pidToCheck) {
 	return find(commandPid.begin(), commandPid.end(), pidToCheck) != commandPid.end();
 }
 
-string getError() {
-	cout << "No active process with given PID found!\n";
-}
-
 clock_t startTimer() {
 	clock_t startTime = clock();
 	return startTime;
@@ -61,21 +58,4 @@ int getNumberOfParams(string raw_input) {
 			count++;
 	}
 	return count;
-}
-
-char* getCharEquivalent(string raw_input) {
-	//code inspired from Lab2 examples
-	int size = getNumberOfParams(raw_input);
-	char *args[size + 1]; //size + 1 to accomodate NULL
-    args[-1] = NULL; //last character should always be null
-
-    size_t position = 0;
-    int startSubString = 0;
-    for (int i = 0; i < size; i++) {
-    	position = raw_input.find(" ", startSubString);
-    	string interimString = raw_input.substr(startSubString, position);
-    	args[i] = strdup(interimString);
-    	startSubString = position + 1;
-    }
-    return args;
 }

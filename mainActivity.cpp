@@ -7,6 +7,7 @@
 #include "map"
 #include "mainActivity.h"
 #include "commandHandler.h"
+#include "utility.h"
 using namespace std;
 
 int getCommandType(string rawInput) {

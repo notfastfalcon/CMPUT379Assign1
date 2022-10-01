@@ -11,7 +11,6 @@
 #include "utility.h"
 using namespace std;
 
-struct rusage ru_utime, ru_stime;
 
 //exit here
 bool shellExit() {
@@ -26,8 +25,8 @@ bool shellExit() {
 	}
 	else {
 		cout <<"Resources used\n";
-		cout <<"User time =\t"<< getrusage(RUSAGE_CHILDREN, &ru_utime) <<" seconds \n";
-		cout <<"Sys  time =\t"<< getrusage(RUSAGE_CHILDREN, &ru_stime) <<" seconds\n";
+		cout <<"User time =\t"<< getUserTime() <<" seconds \n";
+		cout <<"Sys  time =\t"<< getSysTime() <<" seconds\n";
 	}
 	return runShell;
 }
@@ -41,13 +40,13 @@ void shellJobs() {
 		cout <<"#\tPID\tS\tSEC\tCOMMAND\n";
 	}
 	for (auto activePID: allActivePid) {
-		cout << count<<"\t"<<activePID<<"\n";
+		cout << count<<"\t"<<activePID<<"\t"<<getStatus(activePID)<<"\t"<<getArgs(activePID)<<"\n";
 		count ++;
 	}
 	cout << "Processes =\t" << count << " active\n";	
 	cout << "Completed processes:\n";
-	cout <<"User time =\t"<< getrusage(RUSAGE_CHILDREN, &ru_utime) <<" seconds \n";
-	cout <<"Sys  time =\t"<< getrusage(RUSAGE_CHILDREN, &ru_stime) <<" seconds\n";
+	cout <<"User time =\t"<< getUserTime() <<" seconds \n";
+	cout <<"Sys  time =\t"<< getSysTime() <<" seconds\n";
 }
 
 //kill specified process
@@ -72,8 +71,12 @@ void resumeProcess(int processPid) {
 	//Check if Pid is active
 	if(getActiveExistence(processPid)) {
 		//resume the process with given pid
-		if (kill((pid_t)processPid, SIGCONT) < 0)
+		if (kill((pid_t)processPid, SIGCONT) < 0) {
 			perror("Resume failed");
+		}
+		else {
+			updateActiveStatus(processPid, "R");
+		}
 	}
 	else {
 		perror("No PID Found");
@@ -91,8 +94,12 @@ void suspendProcess(int processPid) {
 	//Check if Pid is active
 	if(getActiveExistence(processPid)) {
 		//suspend process with given pid
-		if (kill((pid_t)processPid, SIGSTOP) < 0)
+		if (kill((pid_t)processPid, SIGSTOP) < 0) {
 			perror("Suspend failed");
+		}
+		else {
+			updateActiveStatus(processPid, "S");
+		}
 	}
 	else {
 		perror("No PID Found");
@@ -118,28 +125,33 @@ void waitForProcess(int pid) {
 void executeCommand(string rawInput) {
 	string infile = "";
 	string outfile = "";
+	string processInput = rawInput;
 	bool background = false;
 	//check for special characters like >,<, and &
-	if (rawInput.find('>') != rawInput.length()) {
+	if (rawInput.find('>') < rawInput.length()) {
 		size_t posOfSpecialChar = rawInput.find('>') + 1; //+1 to omit '>'
 		size_t posOfSpace = rawInput.find(" ", posOfSpecialChar); 
 		outfile = rawInput.substr(posOfSpecialChar, posOfSpace - posOfSpecialChar);
+		//-1 to include '<'
+		processInput.erase(posOfSpecialChar-1, posOfSpace-posOfSpecialChar+2);
 	}
-	if (rawInput.find('<') != rawInput.length()) {
+	if (rawInput.find('<') < rawInput.length()) {
 		size_t posOfSpecialChar = rawInput.find('<') + 1; //+1 to omit '<'
 		size_t posOfSpace = rawInput.find(" ", posOfSpecialChar); 
-		outfile = rawInput.substr(posOfSpecialChar, posOfSpace - posOfSpecialChar);
+		infile = rawInput.substr(posOfSpecialChar, posOfSpace - posOfSpecialChar);
+		//-1 to include '<'
+		processInput.erase(posOfSpecialChar-1, posOfSpace-posOfSpecialChar+2); 
 	}
 	if (rawInput.back() == '&') {
 		background = true;
+		processInput.erase(processInput.end()-1, processInput.end());
 	}
-
-	pid_t childPid = newProcess(rawInput);
+	pid_t childPid = newProcess(processInput, background);
 	addToActiveCommand((int)childPid, rawInput);
 }
 
 //spawn a new process
-pid_t newProcess(string processInput) {
+pid_t newProcess(string processInput, bool background) {
 	//convert string to character array
 	int size = getNumberOfParams(processInput);
 	char *args[size+1];
@@ -168,8 +180,10 @@ pid_t newProcess(string processInput) {
 	}
 	
 	else {
-		//wait for child to finish
-		wait(NULL);
+		if(!background) {	
+			//wait for child to finish if it foreground
+			wait(NULL);
+		}
 		return childPid;
 	}
 }

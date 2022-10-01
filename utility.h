@@ -6,13 +6,18 @@
 #include "vector"
 #include "sys/resource.h"
 using namespace std;
-
+struct rusage;
 
 void addToActiveCommand(int, string);
+void updateActiveStatus(int, string);
 int removeActiveCommand(int);
 vector<int> getActiveProcesses(void);
 bool getActiveExistence (int);
+string getStatus(int);
+string getArgs(int);
 int getNumberOfParams(string);
+int getUserTime(void);
+int getSysTime(void);
 void clearMemory(void);
 
 #endif

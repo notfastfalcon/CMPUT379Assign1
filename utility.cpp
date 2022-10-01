@@ -2,6 +2,7 @@
 #include "string.h"
 #include "bits/stdc++.h"
 #include "iostream"
+#include "sys/wait.h"
 #include "vector"
 #include "map"
 #include "fcntl.h"
@@ -46,8 +47,9 @@ vector<int> getActiveProcesses() {
 
 //check if given pid exists
 bool getActiveExistence(int pidToCheck) {
-	//check if running
-	if (kill(((pid_t)pidToCheck), SIGCONT) < 0) {
+	int status;
+	//check if running by sending 
+	if (waitpid((pid_t) pidToCheck, &status, WNOHANG) != 0) {
 		// if not remove from active commands map
 		removeActiveCommand(pidToCheck);
 		return false;

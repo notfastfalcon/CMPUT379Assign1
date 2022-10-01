@@ -19,7 +19,10 @@ bool shellExit() {
 	//wait until all processes are completed if any processes are active
 	vector <int> allActivePid = getActiveProcesses();
 	for (int i: allActivePid) {
-		killProcess(i);
+		//resume all process to ensure any suspended process are resumed
+		resumeProcess(i);
+		//wait for all processes to complete
+		waitForProcess(i);
 	}
 	cout <<"Resources used\n";
 	cout <<"User time =\t"<< getUserTime() <<" seconds \n";

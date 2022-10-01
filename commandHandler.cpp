@@ -144,7 +144,7 @@ void executeCommand(string rawInput) {
 	}
 	if (rawInput.back() == '&') {
 		background = true;
-		processInput.erase(processInput.end()-1, processInput.end());
+		processInput.erase(processInput.end()-2, processInput.end());
 	}
 	pid_t childPid = newProcess(processInput, background);
 	addToActiveCommand((int)childPid, rawInput);

@@ -15,10 +15,12 @@ vector<int> getActiveProcesses(void);
 bool getActiveExistence (int);
 string getStatus(int);
 string getArgs(int);
-void getTime(int);
+string getTime(int);
 int getNumberOfParams(string);
 int getUserTime(void);
 int getSysTime(void);
+void directOutFile(string);
+void directInFile(string);
 void clearMemory(void);
 
 #endif

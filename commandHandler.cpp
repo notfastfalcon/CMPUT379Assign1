@@ -36,8 +36,8 @@ void shellJobs() {
 		cout <<"#\tPID\tS\tSEC\tCOMMAND\n";
 	}
 	for (int activePID: allActivePid) {
-		cout << count<<"\t"<<activePID<<"\t"<<getStatus(activePID);
-		getTime(activePID);
+		cout << count<<"\t"<<activePID<<"\t"<<getStatus(activePID)<<" ";
+		cout << getTime(activePID) << "\t";
 		cout << getArgs(activePID)<<"\n";
 		count ++;
 	}
@@ -152,7 +152,7 @@ void executeCommand(string rawInput) {
 }
 
 //spawn a new process
-pid_t newProcess(string processInput, bool background) {
+pid_t newProcess(string processInput, bool background, string infile, string outfile) {
 	//convert string to character array
 	int size = getNumberOfParams(processInput);
 	char *args[size+1];
@@ -170,6 +170,7 @@ pid_t newProcess(string processInput, bool background) {
 	//create new process using fork
 	pid_t childPid = fork();
 	if(childPid == 0) {
+		directInFile(infile);
 		if(execvp(args[0], args) < 0) {
 			perror("Execve Error");
 			_exit(1);
@@ -181,6 +182,7 @@ pid_t newProcess(string processInput, bool background) {
 	}
 	
 	else {
+		directOutFile(outfile);
 		if(!background) {	
 			//wait for child to finish if it foreground
 			waitForProcess(childPid);

@@ -65,29 +65,31 @@ string getArgs(int pid) {
 }
 
 //prints exectime of the process with given pid
-void getTime(int pid) {
+string getTime(int pid) {
 	string pid_s = to_string(pid);
-	string command = "ps -p " + pid_s +" -o etimes";
+	string command = "ps -p " + pid_s +" -o time";
 	FILE* infile = popen(command.c_str(), "r");
 	if (infile < 0) {
-		perror("Pipe Error");
-		exit(1);
+		return "";
 	}
 	else{
 		ostringstream out;
 		char buf[100];
 		int count = 0;
-		while(fgets(buf, 100, infile) ! NULL) {
+		while(fgets(buf, 100, infile) != NULL) {
 			if (count > 0) {
-				out << buf << "\t";
+				out << buf;
 				break;
 			}
 			else{
 				count++;
 			}
 		}	
-		cout << out;
+		string interim = out.str();
+		//to just print out the value and remove next line character
+		size_t nextPos = interim.find("\n", 1);
 		pclose(infile);
+		return interim.substr(0, nextPos);
 	}
 }
 
@@ -109,6 +111,30 @@ int getUserTime() {
 //returns System CPU time used
 int getSysTime() {
 	return getrusage(RUSAGE_CHILDREN, &ru_stime);
+}
+
+//write to output file
+void directOutFile(string filename) {
+	int ofd;
+	if (!filename.empty()) {
+		if((ofd = open(filename.c_str(), O_CREAT | O_WRONLY)) < 0) {
+        	perror("Open ofd failed!");
+		}
+		dup2(ofd, STDOUT_FILENO);
+		close(ofd);
+	}
+}
+
+//take input from input file
+void directInFile(string filename) {
+	int ifd;
+	if (!filename.empty()) {
+		if((ifd = open(filename.c_str(), O_CREAT | O_RDONLY)) < 0) {
+        	perror("Open ifd failed!");
+		}
+		dup2(ifd, STDIN_FILENO);
+		close(ifd);
+	}
 }
 
 //clear every map

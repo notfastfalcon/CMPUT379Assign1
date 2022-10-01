@@ -13,7 +13,7 @@ void shellSleep(int);
 void suspendProcess(int);
 void waitForProcess(int);
 void executeCommand(string);
-pid_t newProcess(string, bool);
+pid_t newProcess(string, bool, string, string);
 void changeDirectory(string);
 bool shellProcess(string, int);
 

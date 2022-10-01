@@ -4,6 +4,8 @@
 #include "iostream"
 #include "vector"
 #include "map"
+#include "fcntl.h"
+#include "unistd.h"
 #include "algorithm"
 #include "utility.h"
 using namespace std;
@@ -64,13 +66,13 @@ string getArgs(int pid) {
 	return processTable[pid].at(1);
 }
 
-//prints exectime of the process with given pid
-string getTime(int pid) {
+//return exectime of the process with given pid
+int getTime(int pid) {
 	string pid_s = to_string(pid);
 	string command = "ps -p " + pid_s +" -o time";
 	FILE* infile = popen(command.c_str(), "r");
 	if (infile < 0) {
-		return "";
+		return 0;
 	}
 	else{
 		ostringstream out;
@@ -84,12 +86,10 @@ string getTime(int pid) {
 			else{
 				count++;
 			}
-		}	
-		string interim = out.str();
-		//to just print out the value and remove next line character
-		size_t nextPos = interim.find("\n", 1);
-		pclose(infile);
-		return interim.substr(0, nextPos);
+		}
+		// return time	
+		int time = atoi(buf);
+		return time;
 	}
 }
 

@@ -36,7 +36,7 @@ void shellJobs() {
 		cout <<"#\tPID\tS\tSEC\tCOMMAND\n";
 	}
 	for (int activePID: allActivePid) {
-		cout << count<<"\t"<<activePID<<"\t"<<getStatus(activePID)<<" ";
+		cout << count<<"\t"<<activePID<<"\t"<<getStatus(activePID)<<"\t";
 		cout << getTime(activePID) << "\t";
 		cout << getArgs(activePID)<<"\n";
 		count ++;
@@ -147,7 +147,7 @@ void executeCommand(string rawInput) {
 		processInput.erase(processInput.end()-1, processInput.end());
 	}
 	
-	pid_t childPid = newProcess(processInput, background);
+	pid_t childPid = newProcess(processInput, background, infile, outfile);
 	addToActiveCommand((int)childPid, rawInput);
 }
 
@@ -171,6 +171,7 @@ pid_t newProcess(string processInput, bool background, string infile, string out
 	pid_t childPid = fork();
 	if(childPid == 0) {
 		directInFile(infile);
+		directOutFile(outfile);
 		if(execvp(args[0], args) < 0) {
 			perror("Execve Error");
 			_exit(1);
@@ -182,7 +183,6 @@ pid_t newProcess(string processInput, bool background, string infile, string out
 	}
 	
 	else {
-		directOutFile(outfile);
 		if(!background) {	
 			//wait for child to finish if it foreground
 			waitForProcess(childPid);

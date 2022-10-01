@@ -16,8 +16,6 @@ struct rusage ru_utime, ru_stime;
 void addToActiveCommand(int pidToAdd, string args) {
 	//process is running by default
 	processTable[pidToAdd].push_back("R");
-	//TODO: ADD TIME
-
 	//the default args
 	processTable[pidToAdd].push_back(args);
 }
@@ -47,7 +45,7 @@ vector<int> getActiveProcesses() {
 //check if given pid exists
 bool getActiveExistence(int pidToCheck) {
 	//check if running
-	if (kill(((pid_t)pidToCheck), 0) < 0) {
+	if (kill(((pid_t)pidToCheck), SIGCONT) < 0) {
 		// if not remove from active commands map
 		removeActiveCommand(pidToCheck);
 		return false;
@@ -64,6 +62,33 @@ string getStatus(int pid) {
 //get args of the process with given pid
 string getArgs(int pid) {
 	return processTable[pid].at(1);
+}
+
+//prints exectime of the process with given pid
+void getTime(int pid) {
+	string pid_s = to_string(pid);
+	string command = "ps -p " + pid_s +" -o etimes";
+	FILE* infile = popen(command.c_str(), "r");
+	if (infile < 0) {
+		perror("Pipe Error");
+		exit(1);
+	}
+	else{
+		ostringstream out;
+		char buf[100];
+		int count = 0;
+		while(fgets(buf, 100, infile) ! NULL) {
+			if (count > 0) {
+				out << buf << "\t";
+				break;
+			}
+			else{
+				count++;
+			}
+		}	
+		cout << out;
+		pclose(infile);
+	}
 }
 
 // get number of input parameters from command line

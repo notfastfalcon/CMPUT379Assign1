@@ -15,6 +15,7 @@ vector<int> getActiveProcesses(void);
 bool getActiveExistence (int);
 string getStatus(int);
 string getArgs(int);
+void getTime(int);
 int getNumberOfParams(string);
 int getUserTime(void);
 int getSysTime(void);

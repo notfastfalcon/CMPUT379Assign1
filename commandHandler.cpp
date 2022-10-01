@@ -18,16 +18,12 @@ bool shellExit() {
 	int status;
 	//wait until all processes are completed if any processes are active
 	vector <int> allActivePid = getActiveProcesses();
-	if(!allActivePid.empty()) {
-		if (wait(&status) < 0) {
-			perror("Wait failed while exiting");
-		}
+	for (int i: allActivePid) {
+		killProcess(i);
 	}
-	else {
-		cout <<"Resources used\n";
-		cout <<"User time =\t"<< getUserTime() <<" seconds \n";
-		cout <<"Sys  time =\t"<< getSysTime() <<" seconds\n";
-	}
+	cout <<"Resources used\n";
+	cout <<"User time =\t"<< getUserTime() <<" seconds \n";
+	cout <<"Sys  time =\t"<< getSysTime() <<" seconds\n";
 	return runShell;
 }
 
@@ -39,8 +35,10 @@ void shellJobs() {
 	if (!allActivePid.empty()) {
 		cout <<"#\tPID\tS\tSEC\tCOMMAND\n";
 	}
-	for (auto activePID: allActivePid) {
-		cout << count<<"\t"<<activePID<<"\t"<<getStatus(activePID)<<"\t"<<getArgs(activePID)<<"\n";
+	for (int activePID: allActivePid) {
+		cout << count<<"\t"<<activePID<<"\t"<<getStatus(activePID);
+		getTime(activePID);
+		cout << getArgs(activePID)<<"\n";
 		count ++;
 	}
 	cout << "Processes =\t" << count << " active\n";	
@@ -126,7 +124,9 @@ void executeCommand(string rawInput) {
 	string infile = "";
 	string outfile = "";
 	string processInput = rawInput;
+	int mode = 0;
 	bool background = false;
+
 	//check for special characters like >,<, and &
 	if (rawInput.find('>') < rawInput.length()) {
 		size_t posOfSpecialChar = rawInput.find('>') + 1; //+1 to omit '>'
@@ -144,8 +144,9 @@ void executeCommand(string rawInput) {
 	}
 	if (rawInput.back() == '&') {
 		background = true;
-		processInput.erase(processInput.end()-2, processInput.end());
+		processInput.erase(processInput.end()-1, processInput.end());
 	}
+	
 	pid_t childPid = newProcess(processInput, background);
 	addToActiveCommand((int)childPid, rawInput);
 }
@@ -182,9 +183,13 @@ pid_t newProcess(string processInput, bool background) {
 	else {
 		if(!background) {	
 			//wait for child to finish if it foreground
-			wait(NULL);
+			waitForProcess(childPid);
+			return childPid;
 		}
-		return childPid;
+		else{
+			return childPid;
+		}
+		
 	}
 }
 

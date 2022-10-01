@@ -9,7 +9,7 @@
 #include "commandHandler.h"
 using namespace std;
 
-int getCommandType(string raw_input) {
+int getCommandType(string rawInput) {
 	map<string, int> commands = {
 	{"exit", 1},
 	{"jobs", 2},
@@ -21,13 +21,24 @@ int getCommandType(string raw_input) {
 	{"cd", 8},
 	{"\n", -1}
 	};
-	for(auto cmd: commands) {
-		//if we find any of the command in the first position, return int value
-		if (raw_input.find(cmd.first) == 0) {
-			return cmd.second;
-		}
+
+	size_t position = rawInput.find(" ");
+	string cmd = "";
+	//if spaces exist
+	if (position < rawInput.length()) {
+		cmd = rawInput.substr(0, position);
 	}
-	return 0;
+	//if no spaces
+	else {
+		cmd = rawInput;
+	}
+	auto key = commands.find(cmd);
+	
+	if (key != commands.end())
+		return commands[cmd];
+
+	else
+		return 0;
 }
 
 string getInput() {
@@ -37,24 +48,19 @@ string getInput() {
 	return cmdArgument;
 }
 
-void shellInit() {
-	cout << "Welcome to CMPUT 379 Shell!\n";
-}
-
 void shell() {
 	bool runShell = true;
-	shellInit();
 	while (runShell) {
-		string raw_input = getInput();
-		int commandType = getCommandType(raw_input);
-		runShell = shellProcess(raw_input, commandType);
+		string rawInput = getInput();
+		int commandType = getCommandType(rawInput);
+		runShell = shellProcess(rawInput, commandType);
 	}
 	//just to tell OS successful Completion
 	shellQuit();
 }
 
 void shellQuit(){
-	cout<<"Goodbye!\n";
+	clearMemory();
 	_exit(0);
 }
 

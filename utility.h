@@ -7,15 +7,12 @@
 #include "sys/resource.h"
 using namespace std;
 
-struct rusage;
 
 void addToActiveCommand(int, string);
-int removeCommand(int);
+int removeActiveCommand(int);
 vector<int> getActiveProcesses(void);
-bool getExistence (int);
-float sysDuration(struct rusage *start, struct rusage *end);
-float userDuration(struct rusage *start, struct rusage *end);
+bool getActiveExistence (int);
 int getNumberOfParams(string);
-int checkSpecialCmd(string);
+void clearMemory(void);
 
 #endif

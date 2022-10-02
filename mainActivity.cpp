@@ -10,6 +10,7 @@
 #include "utility.h"
 using namespace std;
 
+//returns the type of command entered
 int getCommandType(string rawInput) {
 	map<string, int> commands = {
 	{"exit", 1},
@@ -42,6 +43,7 @@ int getCommandType(string rawInput) {
 		return 0;
 }
 
+//get input from command line
 string getInput() {
 	string cmdArgument;
 	cout << "SHELL379: ";
@@ -49,7 +51,9 @@ string getInput() {
 	return cmdArgument;
 }
 
+//main shell executions
 void shell() {
+	//keep running unless exited
 	bool runShell = true;
 	while (runShell) {
 		string rawInput = getInput();
@@ -60,6 +64,7 @@ void shell() {
 	shellQuit();
 }
 
+//exit with success after shell is exitted
 void shellQuit(){
 	clearMemory();
 	_exit(0);
@@ -67,4 +72,5 @@ void shellQuit(){
 
 int main (int argc, char *argv[]) {
 	shell();
+	return 0;
 }

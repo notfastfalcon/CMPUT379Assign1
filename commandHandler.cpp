@@ -14,6 +14,7 @@ using namespace std;
 
 //exit here
 bool shellExit() {
+	//stop running the shell after printing
 	bool runShell = false;
 	int status;
 	//wait until all processes are completed if any processes are active
@@ -24,6 +25,7 @@ bool shellExit() {
 		//wait for all processes to complete
 		waitForProcess(i);
 	}
+
 	cout <<"Resources used\n";
 	cout <<"User time =\t"<< getUserTime() <<" seconds \n";
 	cout <<"Sys  time =\t"<< getSysTime() <<" seconds\n";
@@ -33,13 +35,14 @@ bool shellExit() {
 //print all jobs here
 void shellJobs() {
 	cout << "Running processes:\n";
+	//only print processes that are actually active
 	vector <int> allActivePid = getActiveProcesses();
 	int count = 0;
 	if (!allActivePid.empty()) {
 		cout <<"#\tPID\tS\tSEC\tCOMMAND\n";
 	}
 	for (int activePID: allActivePid) {
-		cout << count<<"\t"<<activePID<<"\t"<<getStatus(activePID)<<"\t";
+		cout << count <<"\t"<<activePID<<"\t"<<getStatus(activePID)<<"\t";
 		cout << getTime(activePID) << "\t";
 		cout << getArgs(activePID)<<"\n";
 		count ++;
@@ -59,6 +62,7 @@ void killProcess(int processPid) {
 			perror("Kill failed");
 		}
 		else {
+			//remove this command from table
 			removeActiveCommand(processPid);
 		}
 	}
@@ -76,6 +80,7 @@ void resumeProcess(int processPid) {
 			perror("Resume failed");
 		}
 		else {
+			//change status of process in table
 			updateActiveStatus(processPid, "R");
 		}
 	}
@@ -99,6 +104,7 @@ void suspendProcess(int processPid) {
 			perror("Suspend failed");
 		}
 		else {
+			//update status of process in table
 			updateActiveStatus(processPid, "S");
 		}
 	}
@@ -150,7 +156,9 @@ void executeCommand(string rawInput) {
 		processInput.erase(processInput.end()-1, processInput.end());
 	}
 	
+	//create a process without the special characters
 	pid_t childPid = newProcess(processInput, background, infile, outfile);
+	//add to the table
 	addToActiveCommand((int)childPid, rawInput);
 }
 
@@ -163,6 +171,8 @@ pid_t newProcess(string processInput, bool background, string infile, string out
 	//convert string to char*[]
 	size_t position = 0;
     int startSubString = 0;
+
+    //spliting words in the string
     for (int i = 0; i < size; i++) {
     	position = processInput.find(" ", startSubString);
     	string interimString = processInput.substr(startSubString, position-startSubString);
@@ -173,14 +183,19 @@ pid_t newProcess(string processInput, bool background, string infile, string out
 	//create new process using fork
 	pid_t childPid = fork();
 	if(childPid == 0) {
+		//if fork successful
+		//do file handling
 		directInFile(infile);
 		directOutFile(outfile);
+
 		if(execvp(args[0], args) < 0) {
+			//exec failed
 			perror("Execve Error");
 			_exit(1);
 		}
 	}
 	else if(childPid == -1) {
+		//fork failed
 		perror("Fork Error");
 		_exit(1);
 	}
@@ -191,13 +206,15 @@ pid_t newProcess(string processInput, bool background, string infile, string out
 			waitForProcess(childPid);
 			return childPid;
 		}
-		else{
+		else {
+			//else do not wait until child is done
 			return childPid;
 		}
 		
 	}
 }
 
+//special code for change directory
 void changeDirectory(string path) {
 	char pathDir [path.length() + 1] = {};
 	strcpy(pathDir, path.c_str());
@@ -206,6 +223,7 @@ void changeDirectory(string path) {
 	}
 }
 
+//command center of the code. Distributes actions according to the command type entered
 bool shellProcess(string rawInput, int commandType) {
 	bool runShell = true;
 	try {
@@ -241,7 +259,7 @@ bool shellProcess(string rawInput, int commandType) {
 				break;
 		}
 	}
-	// catch all kinds of exceptions
+	// catch all kinds of exceptions here
 	catch(...) {
 		perror("Invalid arguments");
 		runShell = true;

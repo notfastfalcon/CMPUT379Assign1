@@ -48,13 +48,15 @@ vector<int> getActiveProcesses() {
 //check if given pid exists
 bool getActiveExistence(int pidToCheck) {
 	int status;
-	//check if running by sending 
+	//check if running by sending wait WNOHANG signal 
 	if (waitpid((pid_t) pidToCheck, &status, WNOHANG) != 0) {
-		// if not remove from active commands map
+		// if not active remove from active commands map
 		removeActiveCommand(pidToCheck);
+		//return not active
 		return false;
 	}
 	else 
+		//return active
 		return true;
 }
 
@@ -69,6 +71,7 @@ string getArgs(int pid) {
 }
 
 //return exectime of the process with given pid
+//heavily inspired from Lab3
 int getTime(int pid) {
 	string pid_s = to_string(pid);
 	string command = "ps -p " + pid_s +" -o time";

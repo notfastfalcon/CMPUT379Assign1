@@ -77,10 +77,12 @@ int getTime(int pid) {
 		return 0;
 	}
 	else{
+		ostringstream out;
 		char buf[100];
 		int count = 0;
 		while(fgets(buf, 100, infile) != NULL) {
 			if (count > 0) {
+				out << buf;
 				break;
 			}
 			else{

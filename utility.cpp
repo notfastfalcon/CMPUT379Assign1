@@ -12,7 +12,7 @@
 using namespace std;
 
 map <int, vector<string>> processTable;
-struct rusage ru_utime, ru_stime;
+struct rusage usage;
 
 
 //add to active tracked pids
@@ -105,12 +105,14 @@ int getNumberOfParams(string rawInput) {
 
 // returns user CPU time used
 int getUserTime() {
-	return getrusage(RUSAGE_CHILDREN, &ru_utime);
+	getrusage(RUSAGE_CHILDREN, &usage);
+	return usage.ru_utime.tv_sec;
 }
 
 //returns System CPU time used
 int getSysTime() {
-	return getrusage(RUSAGE_CHILDREN, &ru_stime);
+	getrusage(RUSAGE_CHILDREN, &usage);
+	return usage.ru_stime.tv_sec;
 }
 
 //write to output file

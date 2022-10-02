@@ -29,6 +29,7 @@ Code Design:
 	1. mainActivity is responsible for booting up, running and shutting down of the shell.
 	2. commandHandler is responsible for handling each of the commands in their respective functions. 
 	3. utility acts as a supporting code to commandHandler and mainActivity.
+	4. This code compiles on lab machines.
 
 Acknowledgement:
 	> getrusage: https://linux.die.net/man/2/getrusage

@@ -30,7 +30,7 @@ void updateActiveStatus(int pid, string newStatus) {
 }
 
 //remove from tracked pids
-int removeActiveCommand(int pidToRemove) {
+void removeActiveCommand(int pidToRemove) {
 	processTable.erase(pidToRemove);	
 }
 

@@ -10,7 +10,7 @@ struct rusage;
 
 void addToActiveCommand(int, string);
 void updateActiveStatus(int, string);
-int removeActiveCommand(int);
+void removeActiveCommand(int);
 vector<int> getActiveProcesses(void);
 bool getActiveExistence (int);
 string getStatus(int);

@@ -158,8 +158,14 @@ void executeCommand(string rawInput) {
 	
 	//create a process without the special characters
 	pid_t childPid = newProcess(processInput, background, infile, outfile);
-	//add to the table
-	addToActiveCommand((int)childPid, rawInput);
+	if(childPid == -1) {
+		perror("Fork error");
+		_exit(1);
+	}
+	else {
+		//add to the table
+		addToActiveCommand((int)childPid, rawInput);
+	}
 }
 
 //spawn a new process
@@ -193,13 +199,8 @@ pid_t newProcess(string processInput, bool background, string infile, string out
 			perror("Execve Error");
 			_exit(1);
 		}
-	}
-	else if(childPid == -1) {
-		//fork failed
-		perror("Fork Error");
 		_exit(1);
 	}
-	
 	else {
 		if(!background) {	
 			//wait for child to finish if it foreground

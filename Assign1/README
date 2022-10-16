@@ -36,3 +36,5 @@ Acknowledgement:
 	> checking status of forked process: https://stackoverflow.com/questions/26381944/how-to-check-if-a-forked-process-is-still-running-from-the-c-program
 	> Some parts of the codes are heavily inspired from Lab2 and Lab3 of this course.
 
+ShortComings (after grading):
+	> Time returned when jobs is called is always 0. Instead of returning atoi(buf), convert time to seconds using arithmetic calculations.

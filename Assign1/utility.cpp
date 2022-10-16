@@ -90,7 +90,8 @@ int getTime(int pid) {
 				count++;
 			}
 		}
-		// return time	
+		// return time
+		// this is wrong... refer to README ShortComings
 		int time = atoi(buf);
 		return time;
 	}
